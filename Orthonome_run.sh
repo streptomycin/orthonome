@@ -133,7 +133,9 @@ echo "${GREEN}[`date`]${NC}: Running blastp runs"
 
 ln -s $_DIR/blast_runner.sh .
 
-parallel --gnu -j1 --bar 'bash blast_runner.sh {1} {2} {3} {4}' :::: $WKDIR/$FILE :::: $WKDIR/$FILE ::: $THR ::: `pwd`
+ln -s ../*.pep .
+
+parallel --citation --gnu -j1 --bar 'bash blast_runner.sh {1} {2} {3} {4}' :::: $WKDIR/$FILE :::: $WKDIR/$FILE ::: $THR ::: `pwd`
 
 for x in `cat $WKDIR/$FILE`; do 
     for y in `cat $WKDIR/$FILE`; do
@@ -150,7 +152,7 @@ done
 
 echo "${GREEN}[`date`]${NC}: Clustering Blast comparisons between species" 
 
-cat *.blastp|grep -v "#"|parallel --gnu --pipe -q awk '{OFS="\t"}{if ($11<=0.5) print $1, $2, $12;else print $1,$2,0}' | mcl - --abc -q x -V all -te $THR -o Allruns.clusters
+cat *.blastp|grep -v "#"|parallel --citation --gnu --pipe -q awk '{OFS="\t"}{if ($11<=0.5) print $1, $2, $12;else print $1,$2,0}' | mcl - --abc -q x -V all -te $THR -o Allruns.clusters
 
 ################################################################################
 echo "${GREEN}[`date`]${NC}: Finished running Blast comparisons between species" 
@@ -158,13 +160,16 @@ echo "${GREEN}[`date`]${NC}: Finished running Blast comparisons between species"
 mkdir -p $WKDIR/sw_scores
 cd $WKDIR/sw_scores
 
+ln -s ../*.pep .
+ln -s ../*.info .
+
 ################################################################################
 echo "${GREEN}[`date`]${NC}: Running Smith-Waterman alignments between species" 
 
 
 ln -s $_DIR/sw_runner.sh .
 
-parallel --gnu -j1 --bar 'bash sw_runner.sh {1} {2} {3} {4}' :::: $WKDIR/$FILE :::: $WKDIR/$FILE ::: $THR ::: `pwd`
+parallel --citation --gnu -j1 --bar 'bash sw_runner.sh {1} {2} {3} {4}' :::: $WKDIR/$FILE :::: $WKDIR/$FILE ::: $THR ::: `pwd`
 
 for x in `cat $WKDIR/$FILE`; do 
     for y in `cat $WKDIR/$FILE`; do
